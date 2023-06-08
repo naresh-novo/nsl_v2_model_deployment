@@ -5,7 +5,6 @@ WORKDIR .
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-# RUN python -m spacy download en_core_web_sm
 
 COPY nsl_v2_scoring_endpoint.py .
 COPY nsql_model_v2.json .
