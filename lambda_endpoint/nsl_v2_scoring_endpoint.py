@@ -30,7 +30,7 @@ def load_models():
     model.load_model(file_name)
 
     model.save_model("nsql_model_v2_copy.json")
-    
+
     return model
 
 def convert_nulls_to_one_format(df:pd.DataFrame):
