@@ -25,11 +25,9 @@ import json
 
 
 def load_models():
-    file_name = "nsql_model_v2.json"
+    file_name = "./nsql_model_v2.json"
     model = xgboost.XGBClassifier()
     model.load_model(file_name)
-
-    model.save_model("nsql_model_v2_copy.json")
 
     return model
 
@@ -106,12 +104,12 @@ def derive_variables(df:pd.DataFrame):
     # industry type
     df['industry_category_name'] = df['industry_category_name'].str.lower()
     
-    df['industry_category_name_1'] = np.where(df['industry_category_name'
+    df['industry_category_name_professional, scientific, and technical services'] = np.where(df['industry_category_name'
                                                 ]=='professional, scientific, and technical services', 1, 0)
-    df['industry_category_name_2'] = np.where(df['industry_category_name']=='real estate rental and leasing', 1, 0)
-    df['industry_category_name_3'] = np.where(df['industry_category_name']=='retail trade', 1, 0)
-    df['industry_category_name_4'] = np.where(df['industry_category_name']=='manufacturing', 1, 0)
-    df['industry_category_name_5'] = np.where(
+    df['industry_category_name_real estate rental and leasing'] = np.where(df['industry_category_name']=='real estate rental and leasing', 1, 0)
+    df['industry_category_name_retail trade'] = np.where(df['industry_category_name']=='retail trade', 1, 0)
+    df['industry_category_name_manufacturing'] = np.where(df['industry_category_name']=='manufacturing', 1, 0)
+    df['industry_category_name_administrative and support and waste management and remediation services'] = np.where(
         df['industry_category_name']=='administrative and support and waste management and remediation services', 1, 0)
 
     
@@ -164,43 +162,9 @@ def get_predictions(df):
 
     
     # predictors
-    independent_variables = [
-                             'estimated_monthly_revenue',
-                             'incoming_ach_payments',
-                             'screen_width_mean',
-                             'socure_emailrisk_reason_code_i553',
-                             'iovation_device_type_mac',
-                             'industry_category_name_1',
-                             'sh_sw_ratio_mean',
-                             'outgoing_ach_and_checks',
-                             'business_group',
-                             'industry_category_name_2',
-                             'socure_sigma',
-                             'socure_emailrisk',
-                             'industry_category_name_3',
-                             'iovation_device_type_android',
-                             'check_deposit_amount',
-                             'socure_phonerisk_reason_code_i630',
-                             'socure_emailrisk_reason_code_r561',
-                             'socure_emailrisk_reason_code_i566',
-                             'outgoing_wire_transfers',
-                             'socure_phonerisk',
-                             'socure_phonerisk_reason_code_i614',
-                             'socure_reason_code_r207',
-                             'iovation_device_timezone_480',
-                             'industry_category_name_4',
-                             'current_bank_group',
-                             'incoming_wire_transfer',
-                             'socure_phonerisk_reason_code_r616',
-                             'carrier_tmobile',
-                             'industry_category_name_5',
-                             'email_domain_bucket'
-                            ]
+    independent_variables = nsql_model.feature_names_in_
     # get probabilities
-    print(nsql_model)
-    print(nsql_model.predict(df[independent_variables]))
     y_prob = nsql_model.predict_proba(df[independent_variables])
-    print(y_prob)
     
     # return score
     return y_prob[0,1]
