@@ -197,7 +197,7 @@ def lambda_handler(event, context):
     print(f"score: {score}")
     return {
         'statusCode': 200,
-        'body': json.dumps({'probability': str(score)})
+        'body': json.dumps({'application_id': data['application_id'], 'probability': str(score)})
     }
 
 if __name__ == '__main__':
