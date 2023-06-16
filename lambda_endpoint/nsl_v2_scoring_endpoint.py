@@ -31,7 +31,6 @@ def impute_nulls_zeros(df:pd.DataFrame):
     df['incoming_wire_transfer'] = df['incoming_wire_transfer'].fillna('$0')
     df['business_type'] = df['business_type'].fillna('llc')
     df['email_domain'] = df['email_domain'].fillna('gmail.com')
-    df['current_bank'] = df['current_bank'].fillna('novo-is-first')
     df['industry_category_name'] = df['industry_category_name'].fillna('retail trade')
     ################## ALLOY ##################
     df['iovation_device_type'] = df['iovation_device_type'].fillna('iphone')
@@ -51,6 +50,7 @@ def impute_nulls_zeros(df:pd.DataFrame):
     
     return df
 
+# derived variables ----------------------------------------------------------------------------------------------------
 def derive_variables(df:pd.DataFrame):
    
     ################## APPLICATIONS ##################
@@ -67,11 +67,6 @@ def derive_variables(df:pd.DataFrame):
     df['business_type'] = df['business_type'].str.lower()    
     df['business_group'] = np.where(df['business_type'] == 'sole_proprietorship', 0, 1)
 
-    # current bank
-    df['current_bank'] = df['current_bank'].str.lower()    
-    hdb_group = ['bluevine', 'other-national-bank', 'td-ank', 'chase', 'usaa']
-    df['current_bank_group'] = np.where(df['current_bank'].isin(hdb_group), 1, 0)
-
     # email domain
     email_domain_group = ['gmail.com', 'yahoo.com', 'outlook.com', 'icloud.com', 'protonmail.com',
                           'ymail.com', 'me.com', 'hotmail.com', 'aol.com', 'msn.com', 'gmx.com', 'rocketmail.com', 
@@ -84,13 +79,13 @@ def derive_variables(df:pd.DataFrame):
     # industry type
     df['industry_category_name'] = df['industry_category_name'].str.lower()
     
-    df['industry_category_name_professional, scientific, and technical services'] = np.where(df['industry_category_name'
+    df['industry_category_name_1'] = np.where(df['industry_category_name'
                                                 ]=='professional, scientific, and technical services', 1, 0)
-    df['industry_category_name_real estate rental and leasing'] = np.where(df['industry_category_name']=='real estate rental and leasing', 1, 0)
-    df['industry_category_name_retail trade'] = np.where(df['industry_category_name']=='retail trade', 1, 0)
-    df['industry_category_name_manufacturing'] = np.where(df['industry_category_name']=='manufacturing', 1, 0)
-    df['industry_category_name_administrative and support and waste management and remediation services'] = np.where(
+    df['industry_category_name_2'] = np.where(df['industry_category_name']=='real estate rental and leasing', 1, 0)
+    df['industry_category_name_3'] = np.where(df['industry_category_name']=='retail trade', 1, 0)
+    df['industry_category_name_4'] = np.where(
         df['industry_category_name']=='administrative and support and waste management and remediation services', 1, 0)
+    df['industry_category_name_5'] = np.where(df['industry_category_name']=='health care and social assistance', 1, 0)
 
     
     ################## ALLOY ##################
@@ -120,6 +115,8 @@ def derive_variables(df:pd.DataFrame):
                                                          ].str.contains("i614", case=False, na=False), 1, 0)
     df['socure_phonerisk_reason_code_r616'] = np.where(df['socure_phonerisk_reason_code'
                                                          ].str.contains("r616", case=False, na=False), 1, 0)
+    df['socure_phonerisk_reason_code_r639'] = np.where(df['socure_phonerisk_reason_code'
+                                                         ].str.contains("r639", case=False, na=False), 1, 0)
     df['socure_reason_code_r207'] = np.where(df['socure_reason_code'].str.contains("r207", case=False,na=False), 1, 0)
     
 
@@ -130,22 +127,54 @@ def derive_variables(df:pd.DataFrame):
     return df
 
 
-def get_predictions(df):
+# get predictions ------------------------------------------------------------------------------------------------------
+def get_predictions(df:pd.DataFrame):
     #load model
     nsql_model = load_models()
-
     
     # get derived variables
     df = convert_nulls_to_one_format(df)
     df = impute_nulls_zeros(df)
     df = derive_variables(df)
-
     
     # predictors
-    independent_variables = nsql_model.feature_names_in_
+    independent_variables = [
+                             'estimated_monthly_revenue',
+                             'incoming_ach_payments',
+                             'sh_sw_ratio_mean',
+                             'screen_width_mean',
+                             'industry_category_name_1',
+                             'business_group',
+                             'outgoing_ach_and_checks',
+                             'socure_sigma',
+                             'iovation_device_type_mac',
+                             'industry_category_name_2',
+                             'socure_emailrisk',
+                             'socure_emailrisk_reason_code_i566',
+                             'socure_phonerisk',
+                             'industry_category_name_3',
+                             'socure_emailrisk_reason_code_i553',
+                             'iovation_device_type_android',
+                             'outgoing_wire_transfers',
+                             'socure_emailrisk_reason_code_r561',
+                             'check_deposit_amount',
+                             'socure_phonerisk_reason_code_i630',
+                             'socure_reason_code_r207',
+                             'socure_phonerisk_reason_code_i614',
+                             'iovation_device_timezone_480',
+                             'industry_category_name_4',
+                             'socure_phonerisk_reason_code_r616',
+                             'email_domain_bucket',
+                             'incoming_wire_transfer',
+                             'industry_category_name_5',
+                             'socure_phonerisk_reason_code_r639',
+                             'carrier_tmobile'
+                            ]
     # get probabilities
     y_prob = nsql_model.predict_proba(df[independent_variables])
     
+    # # return score
+    # return y_prob[:,1:].flatten()
     # return score
     return y_prob[0,1]
 
@@ -154,7 +183,7 @@ def lambda_handler(event, context):
     
     needed_keys = ['application_id', 'estimated_monthly_revenue', 'incoming_ach_payments', 'outgoing_ach_and_checks', 
      'check_deposit_amount', 'outgoing_wire_transfers', 'incoming_wire_transfer', 'business_type', 
-     'email_domain', 'current_bank', 'industry_category_name', 'iovation_device_type', 'iovation_device_timezone', 
+     'email_domain', 'industry_category_name', 'iovation_device_type', 'iovation_device_timezone', 
      'carrier', 'socure_sigma', 'socure_phonerisk', 'socure_emailrisk', 'socure_reason_code', 'socure_phonerisk_reason_code', 
      'socure_emailrisk_reason_code', 'screen_width_mean', 'screen_height_mean']
     
@@ -183,7 +212,7 @@ def lambda_handler(event, context):
                             "incoming_ach_payments":"$5K +","outgoing_ach_and_checks":"$5K +",
                             "check_deposit_amount":"$5K +","outgoing_wire_transfers":"$0",
                             "incoming_wire_transfer":"<$1K","business_type":"llc","email_domain":"gmail.com",
-                            "current_bank":"WELLS-FARGO","industry_category_name":"Manufacturing",
+                            "industry_category_name":"Manufacturing",
                             "iovation_device_type":"IPHONE","iovation_device_timezone":"300","carrier":"AT&T",
                             "socure_sigma":0.818,"socure_phonerisk":0.583,"socure_emailrisk":0.705,
                             "socure_reason_code":"[\n  \"I610\",\n  \"I626\",\n  \"I711\",\n  \"R559\",\n  \"I632\",\n  \"I705\",\n  \"I631\",\n  \"I553\",\n  \"I611\",\n  \"I614\",\n  \"R610\",\n  \"I636\",\n  \"I630\",\n  \"I708\",\n  \"I618\",\n  \"I555\",\n  \"I707\",\n  \"I602\"\n]",
@@ -206,7 +235,7 @@ if __name__ == '__main__':
                             "incoming_ach_payments":"$5K +","outgoing_ach_and_checks":"$5K +",
                             "check_deposit_amount":"$5K +","outgoing_wire_transfers":"$0",
                             "incoming_wire_transfer":"<$1K","business_type":"llc","email_domain":"gmail.com",
-                            "current_bank":"WELLS-FARGO","industry_category_name":"Manufacturing",
+                            "industry_category_name":"Manufacturing",
                             "iovation_device_type":"IPHONE","iovation_device_timezone":"300","carrier":"AT&T",
                             "socure_sigma":0.818,"socure_phonerisk":0.583,"socure_emailrisk":0.705,
                             "socure_reason_code":"[\n  \"I610\",\n  \"I626\",\n  \"I711\",\n  \"R559\",\n  \"I632\",\n  \"I705\",\n  \"I631\",\n  \"I553\",\n  \"I611\",\n  \"I614\",\n  \"R610\",\n  \"I636\",\n  \"I630\",\n  \"I708\",\n  \"I618\",\n  \"I555\",\n  \"I707\",\n  \"I602\"\n]",
