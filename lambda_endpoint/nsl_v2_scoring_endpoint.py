@@ -79,13 +79,13 @@ def derive_variables(df:pd.DataFrame):
     # industry type
     df['industry_category_name'] = df['industry_category_name'].str.lower()
     
-    df['industry_category_name_1'] = np.where(df['industry_category_name'
+    df['industry_category_name_professional, scientific, and technical services'] = np.where(df['industry_category_name'
                                                 ]=='professional, scientific, and technical services', 1, 0)
-    df['industry_category_name_2'] = np.where(df['industry_category_name']=='real estate rental and leasing', 1, 0)
-    df['industry_category_name_3'] = np.where(df['industry_category_name']=='retail trade', 1, 0)
-    df['industry_category_name_4'] = np.where(
+    df['industry_category_name_real estate rental and leasing'] = np.where(df['industry_category_name']=='real estate rental and leasing', 1, 0)
+    df['industry_category_name_retail trade'] = np.where(df['industry_category_name']=='retail trade', 1, 0)
+    df['industry_category_name_administrative and support and waste management and remediation services'] = np.where(
         df['industry_category_name']=='administrative and support and waste management and remediation services', 1, 0)
-    df['industry_category_name_5'] = np.where(df['industry_category_name']=='health care and social assistance', 1, 0)
+    df['industry_category_name_health care and social assistance'] = np.where(df['industry_category_name']=='health care and social assistance', 1, 0)
 
     
     ################## ALLOY ##################
@@ -143,16 +143,16 @@ def get_predictions(df:pd.DataFrame):
                              'incoming_ach_payments',
                              'sh_sw_ratio_mean',
                              'screen_width_mean',
-                             'industry_category_name_1',
+                             'industry_category_name_professional, scientific, and technical services',
                              'business_group',
                              'outgoing_ach_and_checks',
                              'socure_sigma',
                              'iovation_device_type_mac',
-                             'industry_category_name_2',
+                             'industry_category_name_real estate rental and leasing',
                              'socure_emailrisk',
                              'socure_emailrisk_reason_code_i566',
                              'socure_phonerisk',
-                             'industry_category_name_3',
+                             'industry_category_name_retail trade',
                              'socure_emailrisk_reason_code_i553',
                              'iovation_device_type_android',
                              'outgoing_wire_transfers',
@@ -162,11 +162,11 @@ def get_predictions(df:pd.DataFrame):
                              'socure_reason_code_r207',
                              'socure_phonerisk_reason_code_i614',
                              'iovation_device_timezone_480',
-                             'industry_category_name_4',
+                             'industry_category_name_administrative and support and waste management and remediation services',
                              'socure_phonerisk_reason_code_r616',
                              'email_domain_bucket',
                              'incoming_wire_transfer',
-                             'industry_category_name_5',
+                             'industry_category_name_health care and social assistance',
                              'socure_phonerisk_reason_code_r639',
                              'carrier_tmobile'
                             ]
@@ -209,15 +209,15 @@ def lambda_handler(event, context):
                     'error': "Data not in expected format",
                     'message': """Check Values sent for scoring - sample values - 
                             {"application_id":"35b9598f-1d7b-4e03-b52d-5a3c7a883ada","estimated_monthly_revenue":"$5K +",
-                            "incoming_ach_payments":"$5K +","outgoing_ach_and_checks":"$5K +",
-                            "check_deposit_amount":"$5K +","outgoing_wire_transfers":"$0",
-                            "incoming_wire_transfer":"<$1K","business_type":"llc","email_domain":"gmail.com",
-                            "industry_category_name":"Manufacturing",
-                            "iovation_device_type":"IPHONE","iovation_device_timezone":"300","carrier":"AT&T",
-                            "socure_sigma":0.818,"socure_phonerisk":0.583,"socure_emailrisk":0.705,
-                            "socure_reason_code":"[\n  \"I610\",\n  \"I626\",\n  \"I711\",\n  \"R559\",\n  \"I632\",\n  \"I705\",\n  \"I631\",\n  \"I553\",\n  \"I611\",\n  \"I614\",\n  \"R610\",\n  \"I636\",\n  \"I630\",\n  \"I708\",\n  \"I618\",\n  \"I555\",\n  \"I707\",\n  \"I602\"\n]",
-                            "socure_phonerisk_reason_code":"[\n  \"I610\",\n  \"I626\",\n  \"I632\",\n  \"I620\",\n  \"I631\",\n  \"I611\",\n  \"I614\",\n  \"I636\",\n  \"I630\",\n  \"I618\",\n  \"I602\"\n]","socure_emailrisk_reason_code":"[\n  \"R559\",\n  \"I520\",\n  \"I553\",\n  \"I555\"\n]",
-                            "screen_width_mean":414.0,"screen_height_mean":776.0}"""
+                             "incoming_ach_payments":"$5K +","outgoing_ach_and_checks":"$5K +","check_deposit_amount":"$5K +",
+                             "outgoing_wire_transfers":"$0","incoming_wire_transfer":"<$1K","business_type":"llc",
+                             "email_domain":"gmail.com","industry_category_name":"Manufacturing","iovation_device_type":"IPHONE",
+                             "iovation_device_timezone":"300","carrier":"AT&T","socure_sigma":0.818,"socure_phonerisk":0.583,
+                             "socure_emailrisk":0.705,
+                             "socure_reason_code":'[\\n  \\"I610\\",\\n  \\"I626\\",\\n  \\"I711\\",\\n  \\"R559\\",\\n  \\"I632\\",\\n  \\"I705\\",\\n  \\"I631\\",\\n  \\"I553\\",\\n  \\"I611\\",\\n  \\"I614\\",\\n  \\"R610\\",\\n  \\"I636\\",\\n  \\"I630\\",\\n  \\"I708\\",\\n  \\"I618\\",\\n  \\"I555\\",\\n  \\"I707\\",\\n  \\"I602\\"\\n]',
+                             "socure_phonerisk_reason_code":'[\\n  \\"I610\\",\\n  \\"I626\\",\\n  \\"I632\\",\\n  \\"I620\\",\\n  \\"I631\\",\\n  \\"I611\\",\\n  \\"I614\\",\\n  \\"I636\\",\\n  \\"I630\\",\\n  \\"I618\\",\\n  \\"I602\\"\\n]',
+                             "socure_emailrisk_reason_code":'[\\n  \\"R559\\",\\n  \\"I520\\",\\n  \\"I553\\",\\n  \\"I555\\"\\n]',
+                             "screen_width_mean":414.0,"screen_height_mean":776.0}"""
                 })
             }
     else:
@@ -231,17 +231,19 @@ def lambda_handler(event, context):
 
 if __name__ == '__main__':
     event = {
-        'body': json.dumps({"application_id":"35b9598f-1d7b-4e03-b52d-5a3c7a883ada","estimated_monthly_revenue":"$5K +",
-                            "incoming_ach_payments":"$5K +","outgoing_ach_and_checks":"$5K +",
-                            "check_deposit_amount":"$5K +","outgoing_wire_transfers":"$0",
-                            "incoming_wire_transfer":"<$1K","business_type":"llc","email_domain":"gmail.com",
-                            "industry_category_name":"Manufacturing",
-                            "iovation_device_type":"IPHONE","iovation_device_timezone":"300","carrier":"AT&T",
-                            "socure_sigma":0.818,"socure_phonerisk":0.583,"socure_emailrisk":0.705,
-                            "socure_reason_code":"[\n  \"I610\",\n  \"I626\",\n  \"I711\",\n  \"R559\",\n  \"I632\",\n  \"I705\",\n  \"I631\",\n  \"I553\",\n  \"I611\",\n  \"I614\",\n  \"R610\",\n  \"I636\",\n  \"I630\",\n  \"I708\",\n  \"I618\",\n  \"I555\",\n  \"I707\",\n  \"I602\"\n]",
-                            "socure_phonerisk_reason_code":"[\n  \"I610\",\n  \"I626\",\n  \"I632\",\n  \"I620\",\n  \"I631\",\n  \"I611\",\n  \"I614\",\n  \"I636\",\n  \"I630\",\n  \"I618\",\n  \"I602\"\n]","socure_emailrisk_reason_code":"[\n  \"R559\",\n  \"I520\",\n  \"I553\",\n  \"I555\"\n]",
-                            "screen_width_mean":414.0,"screen_height_mean":776.0})
-    }
+        'body': json.dumps({
+                             "application_id":"35b9598f-1d7b-4e03-b52d-5a3c7a883ada","estimated_monthly_revenue":"$5K +",
+                             "incoming_ach_payments":"$5K +","outgoing_ach_and_checks":"$5K +","check_deposit_amount":"$5K +",
+                             "outgoing_wire_transfers":"$0","incoming_wire_transfer":"<$1K","business_type":"llc",
+                             "email_domain":"gmail.com","industry_category_name":"Manufacturing","iovation_device_type":"IPHONE",
+                             "iovation_device_timezone":"300","carrier":"AT&T","socure_sigma":0.818,"socure_phonerisk":0.583,
+                             "socure_emailrisk":0.705,
+                             "socure_reason_code":'[\\n  \\"I610\\",\\n  \\"I626\\",\\n  \\"I711\\",\\n  \\"R559\\",\\n  \\"I632\\",\\n  \\"I705\\",\\n  \\"I631\\",\\n  \\"I553\\",\\n  \\"I611\\",\\n  \\"I614\\",\\n  \\"R610\\",\\n  \\"I636\\",\\n  \\"I630\\",\\n  \\"I708\\",\\n  \\"I618\\",\\n  \\"I555\\",\\n  \\"I707\\",\\n  \\"I602\\"\\n]',
+                             "socure_phonerisk_reason_code":'[\\n  \\"I610\\",\\n  \\"I626\\",\\n  \\"I632\\",\\n  \\"I620\\",\\n  \\"I631\\",\\n  \\"I611\\",\\n  \\"I614\\",\\n  \\"I636\\",\\n  \\"I630\\",\\n  \\"I618\\",\\n  \\"I602\\"\\n]',
+                             "socure_emailrisk_reason_code":'[\\n  \\"R559\\",\\n  \\"I520\\",\\n  \\"I553\\",\\n  \\"I555\\"\\n]',
+                             "screen_width_mean":414.0,"screen_height_mean":776.0
+                            })
+            }
 
     print(lambda_handler(event, {}))
 

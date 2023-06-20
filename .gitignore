@@ -5,9 +5,10 @@ code/sample_input.ipynb
 code/nsql_score.ipynb
 code/scoring-Copy1.ipynb
 code/scoring-Copy2.ipynb
-
+code/nsql_input_generator-Copy1.ipynb
 
 lambda_endpoint/__pycache__/*
+lambda_endpoint/.ipynb_checkpoints/*
 
 config/config.yaml
 
